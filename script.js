@@ -16,12 +16,12 @@ function toggleMode() {
     if (isDarkMode) {
         body.classList.remove('dark-mode');
         body.classList.add('light-mode');
-        modeToggle.innerHTML = '🌙'; // Switch to moon emoji for light mode
+        modeToggle.innerHTML = '☀️'; // Switch to moon emoji for light mode
         saveModePreference('light');
     } else {
         body.classList.remove('light-mode');
         body.classList.add('dark-mode');
-        modeToggle.innerHTML = '☀️'; // Switch to sun emoji for dark mode
+        modeToggle.innerHTML = '🌙'; // Switch to sun emoji for dark mode
         saveModePreference('dark');
     }
 }
