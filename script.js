@@ -86,7 +86,6 @@ function resetGameState() {
     updateScore();
     applyImageStates();
     saveGameState();
-    console.log("Game state reset. isImageChanged:", isImageChanged);
 }
 
 function applyImageStates() {
@@ -183,11 +182,7 @@ function changeImage(index) {
 
 function resetImages() {
     isImageChanged = [false, false, false];
-    imageElements.forEach((imgDiv, index) => {
-        if (imgDiv) {
-            imgDiv.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAI5JREFUKFNjZEACEbos/0HcFZf/MMKEwQyYhKiyFlj89d1rDM8+/WM49PAfI1xBSFI2w6vbp8AK/j49y7D6wh+IApBukE5NKW6GQ4dPM9jZmoIV3GLUYLh4/goDigKY7qP3/jGANIEVgATt5Jn+hxqwgI1HloS7AaQAJKlvqANWBNIJAnAFMC/BFIIkYGIAijJFxeGM7mEAAAAASUVORK5CYIIA')";
-        }
-    });
+    applyImageStates();
     saveGameState();
 }
 

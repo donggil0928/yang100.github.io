@@ -15,7 +15,7 @@ body.dark-mode {
 
 /* Add styles for light mode */
 body.light-mode {
-    background-color: #5EB8ED;
+    background-color: #ADD8E6;
     color: #000000;
     overflow: hidden;
 }
