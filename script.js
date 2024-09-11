@@ -1,4 +1,5 @@
 // save
+// 점수 2인이 확인하기
 
 let lastImagePosition = null;
 let score = 0;
@@ -39,6 +40,65 @@ function retrieveModePreference() {
     }
 }
 
+function saveGameState() {
+    const gameState = {
+        isImageChanged: isImageChanged,
+        score: score,
+        lastSaveTime: new Date().getTime()
+    };
+
+    localStorage.setItem('gameState', JSON.stringify(gameState));
+}
+
+function loadGameState() {
+    const savedState = localStorage.getItem('gameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+
+        // Check if the saved state is from a previous day
+        const lastSaveDate = new Date(gameState.lastSaveTime);
+        const currentDate = new Date();
+
+        if (!isSameDay(lastSaveDate, currentDate)) {
+            // If it's a new day, reset the images
+            console.log("New day detected. Resetting images.");
+            resetImages();
+        } else {
+            // If it's the same day, load the saved state
+            console.log("Same day. Loading saved state.");
+            isImageChanged = gameState.isImageChanged;
+            score = gameState.score;
+        }
+    } else {
+        // If there's no saved state, initialize with default values
+        console.log("No saved state found. Initializing with default values.");
+        isImageChanged = [false, false, false];
+        score = 0;
+    }
+
+    updateScore();
+    applyImageStates();
+}
+
+function resetGameState() {
+    score = 0;
+    isImageChanged = [false, false, false];
+    updateScore();
+    applyImageStates();
+    saveGameState();
+    console.log("Game state reset. isImageChanged:", isImageChanged);
+}
+
+function applyImageStates() {
+    isImageChanged.forEach((changed, index) => {
+        if (changed && imageElements[index]) {
+            imageElements[index].classList.add('falling-image-blink');
+        } else if (imageElements[index]) {
+            imageElements[index].classList.remove('falling-image-blink');
+        }
+    });
+}
+
 function setInitialImage() {
     const imageContainer = document.getElementById('topRightImage');
     imageContainer.style.position = 'relative';
@@ -48,10 +108,10 @@ function setInitialImage() {
         imgDiv.className = 'top-right-image falling-image';
 
         imgDiv.style.position = 'fixed';
-        imgDiv.style.right = `${20 + i * 40}px`;
-        imgDiv.style.top = '20px';
-        imgDiv.style.width = '32px';
-        imgDiv.style.height = '32px';
+        imgDiv.style.right = `${10 + i * 20}px`;
+        imgDiv.style.top = '10px';
+        imgDiv.style.width = '16px';
+        imgDiv.style.height = '16px';
         imageContainer.appendChild(imgDiv);
         imageElements[i] = imgDiv;
     }
@@ -62,24 +122,23 @@ function setScore() {
     imageContainer.style.position = 'relative';
 
     const imgDiv = document.createElement('div');
-    imgDiv.className = 'head';
+    imgDiv.className = 'score';
     imgDiv.id = 'headImage';
 
     imgDiv.style.position = 'fixed';
-    imgDiv.style.right = `100px`;
-    imgDiv.style.top = '60px';
-    imgDiv.style.width = '64px';
-    imgDiv.style.height = '64px';
+    imgDiv.style.top = '34px';
+    imgDiv.style.width = '16px';
+    imgDiv.style.height = '16px';
     imageContainer.appendChild(imgDiv);
 
     const scoreDiv = document.createElement('div');
     scoreDiv.id = 'scoreDisplay';
     scoreDiv.style.position = 'fixed';
-    scoreDiv.style.right = '20px';
-    scoreDiv.style.top = '60px';
-    scoreDiv.style.fontSize = '24px';
+    scoreDiv.style.right = '10px';
+    scoreDiv.style.top = '30px';
+    scoreDiv.style.fontSize = '16px';
     scoreDiv.style.fontWeight = 'bold';
-    scoreDiv.style.color = 'skyblue';
+    scoreDiv.style.color = 'white';
     //scoreDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // 배경
     //scoreDiv.style.padding = '5px 10px'; // 패딩
     //scoreDiv.style.borderRadius = '5px'; // 모서리 둥글게
@@ -88,13 +147,12 @@ function setScore() {
     scoreDiv.style.fontFamily = "'Galmuri9', sans-serif";
 
     document.body.appendChild(scoreDiv);
-
-    updateScore();
 }
 
 function increaseScore(amount) {
     score += amount;
     updateScore();
+    saveGameState();
 }
 
 function updateScore() {
@@ -105,7 +163,7 @@ function updateScore() {
         scoreDisplay.textContent = `${score}`;
 
         const scoreWidth = scoreDisplay.offsetWidth;
-        const newRightPosition = 20 + scoreWidth + 10; // 20px(원래 간격) + 점수 너비 + 10px(추가 간격)
+        const newRightPosition = 10 + scoreWidth + 10; // 20px(원래 간격) + 점수 너비 + 10px(추가 간격)
         headImage.style.right = `${newRightPosition}px`;
     }
 }
@@ -119,6 +177,7 @@ function changeImage(index) {
         imageElements[index].classList.add('falling-image-blink');
         isImageChanged[index] = true;
         increaseScore(1);
+        saveGameState();
     }
 }
 
@@ -129,6 +188,31 @@ function resetImages() {
             imgDiv.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAI5JREFUKFNjZEACEbos/0HcFZf/MMKEwQyYhKiyFlj89d1rDM8+/WM49PAfI1xBSFI2w6vbp8AK/j49y7D6wh+IApBukE5NKW6GQ4dPM9jZmoIV3GLUYLh4/goDigKY7qP3/jGANIEVgATt5Jn+hxqwgI1HloS7AaQAJKlvqANWBNIJAnAFMC/BFIIkYGIAijJFxeGM7mEAAAAASUVORK5CYIIA')";
         }
     });
+    saveGameState();
+}
+
+function getNextResetTime() {
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow.getTime();
+}
+
+function scheduleNextReset() {
+    const now = new Date().getTime();
+    const nextReset = getNextResetTime();
+    const timeUntilReset = nextReset - now;
+
+    setTimeout(() => {
+        resetImages();
+        scheduleNextReset(); // Schedule the next reset
+    }, timeUntilReset);
+}
+
+function isSameDay(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getDate() === date2.getDate();
 }
 
 function createImageAtPosition(x, y) {
@@ -157,8 +241,8 @@ function createImageAtPosition(x, y) {
     }, 4000);
 
     setTimeout(() => {
-            imageObj.active = false;
-            img.remove();
+        imageObj.active = false;
+        img.remove();
     }, 5000);
 }
 
@@ -241,6 +325,12 @@ function init() {
     topRightImage = document.getElementById('topRightImage');
     setInitialImage();
     setScore();
+
+    loadGameState();
+
+    saveGameState();
+
+    scheduleNextReset();
 
     const elements = {
         body: document.querySelector('.wrapper'),
@@ -654,5 +744,11 @@ function init() {
 
     createDog();
 }
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'r' || event.key === 'R') {
+        resetGameState();
+    }
+});
 
 window.addEventListener('DOMContentLoaded', init)

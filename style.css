@@ -3,7 +3,7 @@
 }
 /* Add styles for dark mode */
 body.dark-mode {
-    background-color: #1a1a1a;
+    background-color: #1D2937;
     color: #ffffff;
     overflow: hidden;
 }
@@ -15,7 +15,7 @@ body.dark-mode {
 
 /* Add styles for light mode */
 body.light-mode {
-    background-color: #ffffff;
+    background-color: #5EB8ED;
     color: #000000;
     overflow: hidden;
 }
@@ -241,6 +241,11 @@ p, h1, h2, h3, h4 {
 
 .heart-image.fade-out {
     opacity: 0;
+}
+
+.score {
+    position: absolute;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHNJREFUOE+1U9EKACEIu/3/R3soGEtMjKqnbHNpM3y0REQ8BIAONkiazEkcV5gJREI8q3BkYEdgcJ4J8AOu9na5l8Kk6IBj7JKeKW+yqnNr5NwRyErLqklbWLnQacdyn9lYjTK7cj7KkxrZuvWZskHpfucfKgKv+aW0UKcAAAAASUVORK5CYIIA);
 }
 
 .sign {
