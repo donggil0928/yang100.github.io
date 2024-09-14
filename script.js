@@ -55,22 +55,17 @@ function loadGameState() {
     if (savedState) {
         const gameState = JSON.parse(savedState);
 
-        // Check if the saved state is from a previous day
         const lastSaveDate = new Date(gameState.lastSaveTime);
         const currentDate = new Date();
 
         if (!isSameDay(lastSaveDate, currentDate)) {
-            // If it's a new day, reset the images
-            console.log("New day detected. Resetting images.");
-            resetImages();
+            isImageChanged = [false, false, false];
+            score = gameState.score;
         } else {
-            // If it's the same day, load the saved state
-            console.log("Same day. Loading saved state.");
             isImageChanged = gameState.isImageChanged;
             score = gameState.score;
         }
     } else {
-        // If there's no saved state, initialize with default values
         console.log("No saved state found. Initializing with default values.");
         isImageChanged = [false, false, false];
         score = 0;
@@ -199,8 +194,10 @@ function scheduleNextReset() {
     const timeUntilReset = nextReset - now;
 
     setTimeout(() => {
-        resetImages();
-        scheduleNextReset(); // Schedule the next reset
+        isImageChanged = [false, false, false];
+        applyImageStates();
+        saveGameState();
+        scheduleNextReset();
     }, timeUntilReset);
 }
 
@@ -322,9 +319,7 @@ function init() {
     setScore();
 
     loadGameState();
-
     saveGameState();
-
     scheduleNextReset();
 
     const elements = {
@@ -740,10 +735,10 @@ function init() {
     createDog();
 }
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'r' || event.key === 'R') {
-        resetGameState();
-    }
-});
+//document.addEventListener('keydown', function(event) {
+//    if (event.key === 'r' || event.key === 'R') {
+//        resetGameState();
+//    }
+//});
 
 window.addEventListener('DOMContentLoaded', init)
